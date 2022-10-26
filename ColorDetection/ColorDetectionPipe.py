@@ -17,7 +17,7 @@ def DetermineColor(H, S, V):
               'purple': [[158, 255, 255], [129, 50, 70]],
               'orange': [[24, 255, 255], [5, 143, 0]],
               'gray': [[180, 18, 230], [0, 0, 40]],
-              'beige': [[23,255,227], [12,44,30]]
+              #'beige': [[23,255,227], [12,44,30]]
               }
     new_color_dict_HSV = {
         'red': [[4,255,255],[0,162,70]],
@@ -75,12 +75,13 @@ def ColorDetectionPipe( xmin, xmax, ymin, ymax, picturePath):
             secondary_color = color
     print("----")
     img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(img,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
-    cv2.putText(img,"secondary_color: " + secondary_color,(xmin+10, ymax+40),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
-    cv2.imshow("image",img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #font = cv2.FONT_HERSHEY_SIMPLEX
+    #cv2.putText(img,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+    #cv2.putText(img,"secondary_color: " + secondary_color,(xmin+10, ymax+40),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+    #cv2.imshow("image",img)
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+    return [primary_color,secondary_color]
         
         
 
