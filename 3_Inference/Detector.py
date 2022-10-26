@@ -363,6 +363,8 @@ def getClothingItems(img_path):
     )
     y_size, x_size, _ = np.array(image).shape
     for single_prediction in prediction:
+        print("Single Prediction:")
+        print(single_prediction)
         out_df = out_df.append(
             pd.DataFrame(
                 [
@@ -389,6 +391,12 @@ def getClothingItems(img_path):
         )
     
     print(out_df)
+
+    print("First row of dataframe:")
+    print(out_df.iloc[0])
+    
+    print("Xmin of first row:")
+    print(out_df.iloc[0]["xmin"])
 
 
 

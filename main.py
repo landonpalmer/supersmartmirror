@@ -1,5 +1,6 @@
 import os
 import sys
+import cv2
 
 
 def get_parent_dir(n=1):
@@ -97,10 +98,14 @@ def getClothingItems(img_path):
         img_path,
         save_img=True,
         save_img_path=detection_results_folder,
-        postfix="_clothes",
+        postfix="_out",
     )
     y_size, x_size, _ = np.array(image).shape
     for single_prediction in prediction:
+
+        print("single prediction")
+        print(single_prediction)
+
         out_df = out_df.append(
             pd.DataFrame(
                 [
@@ -126,7 +131,24 @@ def getClothingItems(img_path):
             )
         )
     
-    print(out_df)
+    yolo.close_session()
+    
+    return out_df
 
 
-getClothingItems("./Data/Source_Images/Test_Images/000371.jpg")
+####### Test this on mac - WSL doesn't have write drivers or something #########
+
+# initialize the camera
+# cam = cv2.VideoCapture(0)   # 0 -> index of camera
+# s, img = cam.read()
+# if s:    # frame captured without any errors
+#     cv2.namedWindow("cam-test",cv2.CV_WINDOW_AUTOSIZE)
+#     cv2.imshow("cam-test",img)
+#     cv2.waitKey(0)
+#     cv2.destroyWindow("cam-test")
+#     cv2.imwrite("filename.jpg",img) # save img
+
+img_path = sys.argv[1]
+
+clothingItemsDF = getClothingItems(img_path)
+
