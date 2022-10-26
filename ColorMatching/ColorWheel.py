@@ -216,11 +216,7 @@ class ColorWheel:
         
         return suggestions
         
-
-
-
         
-    
-    
+
 
 
