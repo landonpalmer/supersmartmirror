@@ -176,9 +176,13 @@ for index, row in clothingItemsDF.iterrows():
 
     
     ######### ColorDetectionPipe throws an error -- also should return list of colors (id doesn't right now) #####
-    # itemColors = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path)
+    itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path)
+    #colorDetection returns an array of [(primary_color, score),(secondary_color, score), (unknown, score)]
+    #I want to compare the amount of unknown pixels to the primary and secondary to see if it would be a good idea to filter not great data
+    #for now i think ill just place the item colors as primary and secondary
+    itemColors = [itemColorsSet[0][0], itemColorsSet[1][0]]
     # colorList.extend(itemColors)
-    itemColors = ["red", "green", "blue"]
+    #itemColors = ["red", "green", "blue"]
     for color in itemColors:
         colorSet.add(color)
     print()
