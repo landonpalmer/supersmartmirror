@@ -185,7 +185,6 @@ for index, row in clothingItemsDF.iterrows():
     #itemColors = ["red", "green", "blue"]
     for color in itemColors:
         colorSet.add(color)
-    print()
     print(row["label"], "determined to be", itemColors)
 
 

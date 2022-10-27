@@ -41,6 +41,12 @@ def DetermineColor(H, S, V):
     return "unknown"
 
 def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath):
+    shrinkerx = int((xmax - xmin)*.10)
+    shrinkery = int((ymax - ymin)*.10)
+    xmin+=shrinkerx
+    xmax-=shrinkerx
+    ymin+=shrinkery
+    ymax-=shrinkery
     img = cv2.imread(picturePath)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img = cv2.rectangle(img,(xmin, ymax),(xmax, ymin),(255,255,0),1)
@@ -55,30 +61,19 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath):
         'gray': 0,
         'unknown': 0,
         'beige': 0}
-    for i in range(xmin+1,xmax-1, 3):
-        for j in range(ymin+1,ymax-1, 3):
-            pixel = img[i,j]
+    for i in range(xmin,xmax, 1):
+        for j in range(ymin,ymax, 1):
+            pixel = img[j,i]
             color = DetermineColor(pixel[0],pixel[1],pixel[2])
             color_dict_scores[color] += 1
-    primary_color = ""
-    secondary_color = ""
-    maxColor = 0
-    primary_color_return = []
-    secondary_color_return = []
+    
+    unknown_value = color_dict_scores["unknown"]
+    del color_dict_scores['unknown']
+    primary_color = max(color_dict_scores, key=color_dict_scores.get)
+    secondary_color = sorted(color_dict_scores, key=color_dict_scores.get)[-2]
     for color in color_dict_scores:
-        if color == "unknown":
-            continue
-        print(color+ ": " + str(color_dict_scores[color]))
-        if color_dict_scores[color] > maxColor:
-            secondary_color = primary_color
-
-            primary_color = color
-            primary_color_return = (primary_color, color_dict_scores[primary_color])
-
-            maxColor = color_dict_scores[color]
-        elif secondary_color == "" and color_dict_scores[color] > 0:
-            secondary_color = color
-            secondary_color_return = (secondary_color, color_dict_scores[secondary_color])
+        print(color + ": " + str(color_dict_scores[color]))
+            
     print("----")
     img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -88,6 +83,8 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath):
     # cv2.imshow("image",img)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
-    return [primary_color_return,secondary_color_return, ("unknown", color_dict_scores['unknown'])]
+    primary_color_return = (primary_color, color_dict_scores[primary_color])
+    secondary_color_return = (secondary_color, color_dict_scores[secondary_color])
+    return [primary_color_return,secondary_color_return, ("unknown", unknown_value)]
 
 

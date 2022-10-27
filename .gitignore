@@ -4,10 +4,13 @@
 *.pb 
 *.gz
 *.npy
+*.jpeg
+*.jpg
 test.py
 
 # Image Files
 Data/Source_Images
+Data/Model_Weights
 
 # tf event files
 events.out.tfevents.*
