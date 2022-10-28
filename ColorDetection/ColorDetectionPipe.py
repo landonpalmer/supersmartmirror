@@ -1,3 +1,4 @@
+from platform import mac_ver
 import cv2
 def CompareBounds(H, S, V, upper_bound, lower_bound):
     if H <= upper_bound[0] and H >= lower_bound[0]:

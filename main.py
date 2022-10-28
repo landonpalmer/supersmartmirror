@@ -182,7 +182,7 @@ for index, row in clothingItemsDF.iterrows():
     #for now i think ill just place the item colors as primary and secondary
     itemColors = [itemColorsSet[0][0], itemColorsSet[1][0]]
     # colorList.extend(itemColors)
-    #itemColors = ["red", "green", "blue"]
+    # itemColors = ["red", "green", "blue"]
     for color in itemColors:
         colorSet.add(color)
     print(row["label"], "determined to be", itemColors)
@@ -192,13 +192,28 @@ for index, row in clothingItemsDF.iterrows():
 
 
 wheel = ["red", "red-orange", "orange", "yellow-orange", "yellow", "yellow-green", "green", "blue-green", "blue", "blue-violet", "violet", "red-violet"]
+neutralColors = ["black", "white", "gray", "beige"]
+
 
 cw = ColorWheel(wheel)
 
 colorList.clear()
 colorList = list(colorSet)
 
-if (len(colorList) == 2):
+print("Color list is", colorList)
+
+# Remove all neutral colors from colorlist
+hadNeutral = False
+for color in colorList:
+    if (color in neutralColors):
+        hadNeutral = True
+        colorList.remove(color)
+
+print("Color List is now", colorList)
+
+if len(colorList) <= 1 and hadNeutral:
+    print("Colors Match!!")
+elif (len(colorList) == 2):
     if (cw.do2ColorsMatch(colorList[0], colorList[1])):
         print("Colors Match!!")
     else:
