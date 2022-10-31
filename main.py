@@ -1,6 +1,7 @@
 import os
 import sys
-# import cv2
+import cv2
+import time
 
 
 def get_parent_dir(n=1):
@@ -104,7 +105,7 @@ def getClothingItems(img_path):
         img_path,
         save_img=True,
         save_img_path=detection_results_folder,
-        postfix="_out",
+        postfix="_clothing",
     )
     y_size, x_size, _ = np.array(image).shape
     for single_prediction in prediction:
@@ -121,6 +122,7 @@ def getClothingItems(img_path):
                     ]
                     + single_prediction
                     + [x_size, y_size]
+                    + [input_labels[single_prediction[4]]]
                 ],
                 columns=[
                     "image",
@@ -129,10 +131,11 @@ def getClothingItems(img_path):
                     "ymin",
                     "xmax",
                     "ymax",
-                    "label",
+                    "label_index",
                     "confidence",
                     "x_size",
                     "y_size",
+                    "label",
                 ],
             )
         )
@@ -143,28 +146,76 @@ def getClothingItems(img_path):
 
 
 ####### Test this on mac - WSL doesn't have write drivers or something #########
-
-# initialize the camera
-# cam = cv2.VideoCapture(0)   # 0 -> index of camera
-# s, img = cam.read()
-# if s:    # frame captured without any errors
-#     cv2.namedWindow("cam-test",cv2.CV_WINDOW_AUTOSIZE)
-#     cv2.imshow("cam-test",img)
-#     cv2.waitKey(0)
-#     cv2.destroyWindow("cam-test")
-#     cv2.imwrite("filename.jpg",img) # save img
-
+img_path = ""
 if (len(sys.argv) <= 1):
-    print("Please use the filename as an argument")
-    exit(0)
+    TIMER = 5
 
-img_path = sys.argv[1]
+    # initialize the camera
+    cam = cv2.VideoCapture(0)
+
+    cv2.namedWindow("Camera")
+
+    while True:
+
+        # Display the current frame
+        ret, frame = cam.read()
+        if not ret:
+            print("failed to grab frame")
+            break
+        cv2.imshow("Camera", frame)
+
+        # check for key to be pressed
+        k = cv2.waitKey(1)
+        if k%256 == 32:
+            # SPACE pressed start countdown timer
+
+            prev = time.time()
+            
+            while TIMER >= 0:
+                ret, frame = cam.read()
+
+                # Display the countdown on the frame
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(frame, str(TIMER), (200, 250), font, 7, 
+                    (0, 255, 255), 4, cv2.LINE_AA)
+                cv2.imshow('Camera', frame)
+                cv2.waitKey(125)
+
+                # get current time
+                curr = time.time()
+
+                if curr-prev >= 1:
+                    prev = curr
+                    TIMER = TIMER - 1
+                
+            
+            ret, img = cam.read()
+            cv2.imshow('Camera', img)
+
+            cv2.waitKey(2000)
+
+            img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
+            cv2.imwrite(img_path, img)
+            print("{} written!".format(img_path))
+            
+            break
+
+    cam.release()
+
+    cv2.destroyAllWindows()
+else:
+    img_path = sys.argv[1]
 
 #--------- Clothing Item Detection -------------
 clothingItemsDF = getClothingItems(img_path)
+out_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
 
 colorList = []
 colorSet = set()
+
+# Set the initial image
+img = cv2.imread(img_path)
+cv2.imwrite(out_path, img)
 
 for index, row in clothingItemsDF.iterrows():
     xmin = row["xmin"]
@@ -172,15 +223,16 @@ for index, row in clothingItemsDF.iterrows():
     ymin = row["ymin"]
     ymax = row["ymax"]
 
-    print("Box is (" + str(xmin) + ", " + str(ymin) + ")", "(" + str(xmax) + ",", str(ymax) + ")")
-
+    print("Row is", row)
     
     ######### ColorDetectionPipe throws an error -- also should return list of colors (id doesn't right now) #####
-    itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path)
+
+    itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path, out_path)
     #colorDetection returns an array of [(primary_color, score),(secondary_color, score), (unknown, score)]
     #I want to compare the amount of unknown pixels to the primary and secondary to see if it would be a good idea to filter not great data
     #for now i think ill just place the item colors as primary and secondary
-    itemColors = [itemColorsSet[0][0], itemColorsSet[1][0]]
+    # itemColors = [itemColorsSet[0][0], itemColorsSet[1][0]]
+    itemColors = itemColorsSet
     # colorList.extend(itemColors)
     # itemColors = ["red", "green", "blue"]
     for color in itemColors:
@@ -199,15 +251,14 @@ cw = ColorWheel(wheel)
 
 colorList.clear()
 colorList = list(colorSet)
+tempSize = len(colorList)
+
+hadNeutral = tempSize == len(colorList)
 
 print("Color list is", colorList)
 
 # Remove all neutral colors from colorlist
-hadNeutral = False
-for color in colorList:
-    if (color in neutralColors):
-        hadNeutral = True
-        colorList.remove(color)
+colorList = list(set(colorList).difference(neutralColors))
 
 print("Color List is now", colorList)
 

@@ -30,38 +30,46 @@ def DetermineColor(H, S, V):
         'blue' : [[122,255,255],[83,118,0]],
         'violet': [[166,255,255],[125,109,0]],
         'white': [[180,40,255],[0,0,231]],
-        'black': [[179,255,58],[0,0,0]]
+        'black': [[179,255,58],[0,0,0]],
+        'gray': [[180, 18, 230], [0, 0, 40]],
+        'beige': [[23,255,227], [12,44,30]]
     }
-    for color in color_dict_HSV:
-        upper_bound = color_dict_HSV[color][0]
-        lower_bound = color_dict_HSV[color][1]
+    for color in new_color_dict_HSV:
+        upper_bound = new_color_dict_HSV[color][0]
+        lower_bound = new_color_dict_HSV[color][1]
         if (CompareBounds(H, S, V, upper_bound, lower_bound)):
-            if (color == "red1") or (color == "red2"):
-                return "red"
+            # if (color == "red1") or (color == "red2"):
+            #     return "red"
             return color
     return "unknown"
 
-def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath):
+def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath):
     shrinkerx = int((xmax - xmin)*.10)
     shrinkery = int((ymax - ymin)*.10)
     xmin+=shrinkerx
     xmax-=shrinkerx
     ymin+=shrinkery
     ymax-=shrinkery
-    img = cv2.imread(picturePath)
+
+   
+    img = cv2.imread(picturePath)    
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img = cv2.rectangle(img,(xmin, ymax),(xmax, ymin),(255,255,0),1)
-    color_dict_scores = {'black': 0,
-        'white': 0,
+    color_dict_scores = {
         'red': 0,
+        'red-orange': 0,
+        'orange': 0,
+        'yellow-orange': 0,
+        'yellow': 0,
         'green': 0,
         'blue': 0,
-        'yellow': 0,
-        'purple': 0,
-        'orange': 0,
+        'violet': 0,
+        'white': 0,
+        'black': 0,
         'gray': 0,
-        'unknown': 0,
-        'beige': 0}
+        'beige': 0,
+        'unknown': 0, 
+    }
     for i in range(xmin,xmax, 1):
         for j in range(ymin,ymax, 1):
             pixel = img[j,i]
@@ -76,16 +84,36 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath):
         print(color + ": " + str(color_dict_scores[color]))
             
     print("----")
-    img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
+
     font = cv2.FONT_HERSHEY_SIMPLEX
+    outImg = cv2.imread(outputPath)
+    cv2.rectangle(outImg,(xmin, ymax),(xmax, ymin),(255,255,0),1)
+    cv2.putText(outImg,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+
+    # Only returns secondary color if it is greater than 15% of primary color
+    primaryScore = color_dict_scores[primary_color]
+    secondaryScore = color_dict_scores[secondary_color]
     
-    # cv2.putText(img,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
-    # cv2.putText(img,"secondary_color: " + secondary_color,(xmin+10, ymax+40),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
-    # cv2.imshow("image",img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    primary_color_return = (primary_color, color_dict_scores[primary_color])
-    secondary_color_return = (secondary_color, color_dict_scores[secondary_color])
-    return [primary_color_return,secondary_color_return, ("unknown", unknown_value)]
+    primary_color_return = (primary_color, primaryScore)
+    secondary_color_return = (secondary_color, secondaryScore)
+
+    if secondaryScore > (primaryScore * 0.15):
+        cv2.putText(outImg,"secondary_color: " + secondary_color,(xmin+10, ymax+40),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+        
+        cv2.imwrite(outputPath, outImg)
+
+        cv2.destroyAllWindows()
+
+        return [primary_color, secondary_color]
+    
+    # Save the cv2 img
+    cv2.imwrite(outputPath, outImg)
+    cv2.destroyAllWindows()
+
+    return [primary_color]
+
+
+
+    # return [primary_color_return,secondary_color_return, ("unknown", unknown_value)]
 
 
