@@ -7,7 +7,6 @@ import os
 import sys
 import cv2
 import time
-import threading
 
 
 def get_parent_dir(n=1):
@@ -163,7 +162,7 @@ def getClothingData():
         TIMER = 5
         print("Entered sys arg")
         # initialize the camera
-        cam = cv2.VideoCapture(0)
+        cam = cv2.VideoCapture(1)
         print("Entered video capture")
         cv2.namedWindow("Camera")
 
@@ -276,6 +275,7 @@ def getClothingData():
 
     if len(colorList) <= 1 and hadNeutral:
         print("Colors Match!!")
+        return "Colors Match!!"
     elif (len(colorList) == 2):
         if (cw.do2ColorsMatch(colorList[0], colorList[1])):
             print("Colors Match!!")
@@ -324,7 +324,7 @@ def getClothingData():
 @app.route('/')
 # ‘/’ URL is bound with index function.
 def index():
-    threading.Thread(target=getClothingData()).start()
+    # threading.Thread(target=getClothingData()).start()
     fetched_cat_fact=getClothingData()
     return render_template("index.html", cat_fact=fetched_cat_fact)
  
