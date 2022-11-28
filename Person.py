@@ -1,8 +1,3 @@
-tops = ["Short sleeve top", "Long sleeve top", "Short sleeve outwear", "Long sleeve outwear", "Vest", "Sling"]
-bottoms = ["Shorts", "Trousers", "Skirt"]
-neither = ["Short sleeve dress","Long sleeve dress", "Vest dress", "Sling dress"]
-warm = ["Short sleeve top","Short sleeve outwear","Sling","Shorts", "Skirt", "Short sleeve dress", "Vest dress", "Sling dress"]
-cold = ["Trousers", "Long sleeve dress", "Vest",  "Long sleeve top", "Long sleeve outwear"]
 class Outfit:
     def __init__(self):
         self.count = 0
@@ -13,7 +8,11 @@ class Outfit:
         self.isWarmOriented = False
     def setColors(self, colorList):
         self.colors = colorList
-    def setOutfit(self, itemList, colorList):
+    def setOutfit(self, itemList):
+        tops = ["short sleeve top", "long sleeve top", "short sleeve outwear", "long sleeve outwear", "vest", "sling"]
+        bottoms = ["shorts", "trousers", "skirt"]
+        warm = ["short sleeve top","short sleeve outwear","sling","shorts", "skirt", "short sleeve dress", "vest dress", "sling dress"]
+        cold = ["trousers", "long sleeve dress", "vest",  "long sleeve top", "long sleeve outwear"]
         WarmCount = 0
         ColdCount = 0
         for clothing in itemList:
@@ -24,17 +23,25 @@ class Outfit:
             self.count+=1
         if WarmCount >= ColdCount:
             self.isWarmOriented = True
-        elif ColdCount >= WarmCount:
+        if ColdCount >= WarmCount:
             self.isColdOriented = True
+        if ColdCount == WarmCount:
+            self.isColdOriented = True
+            self.isWarmOriented = True
         if self.count == 1:
-            self.top = itemList[0]
-            self.bottom = itemList[0]
+            if itemList[0] in bottoms:
+                self.bottom = itemList[0]
+            elif itemList[0] in tops:
+                self.top = itemList[0]
+            else:
+                self.top = itemList[0]
+                self.bottom = itemList[0]
         else:
             for clothing in itemList:
                 if clothing in tops:
                     self.top = clothing
                 elif clothing in bottoms:
-                    self.bototm = clothing
+                    self.bottom = clothing
         
 
 class Person: 
@@ -43,7 +50,7 @@ class Person:
         self.Name = name
         self.favoriteColors = favoriteColors
     def setOutfit(self, newOutfit):
-        self.Outfits.insert(newOutfit)
+        self.Outfits.append(newOutfit)
     def setNewColors(self, newColors):
         self.favoriteColors = newColors
     

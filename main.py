@@ -2,7 +2,7 @@ import os
 import sys
 import cv2
 import time
-
+from Person import Outfit, Person
 
 def get_parent_dir(n=1):
     """returns the n-th parent dicrectory of the current
@@ -217,11 +217,13 @@ colorSet = set()
 img = cv2.imread(img_path)
 cv2.imwrite(out_path, img)
 
+itemList = []
 for index, row in clothingItemsDF.iterrows():
     xmin = row["xmin"]
     xmax = row["xmax"]
     ymin = row["ymin"]
     ymax = row["ymax"]
+    itemList.append(row["label"])
 
     print("Row is", row)
     
@@ -256,6 +258,11 @@ tempSize = len(colorList)
 hadNeutral = tempSize == len(colorList)
 
 print("Color list is", colorList)
+outfit = Outfit()
+outfit.setColors(colorList=colorList)
+outfit.setOutfit(itemList=itemList)
+jackson = Person("Jackson", ["Red", "Blue"])
+jackson.setOutfit(newOutfit=outfit)
 
 # Remove all neutral colors from colorlist
 colorList = list(set(colorList).difference(neutralColors))
@@ -300,3 +307,9 @@ elif (len(colorList) == 3):
         print("Color combination(s) for(" + colorList[1] + ", " + colorList[2] + ")")
         for colors in cw.thirdColorSuggestion(colorList[1], colorList[2]):
             print(colors)
+print("Outfit top: " + outfit.top)
+print("Outfit Bottom: " + outfit.bottom)
+print("Outfit is for cold? " + str(outfit.isColdOriented))
+print("Outfit is for warm? " + str(outfit.isWarmOriented))
+print("How many articles of clothing? "+ str(outfit.count))
+print("Colors: " + str(outfit.colors))
