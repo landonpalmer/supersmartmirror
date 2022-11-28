@@ -3,7 +3,7 @@ import socket
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('localhost', 1002))
+server.bind(('192.168.0.15', 1025))
 server.listen()
 
 client_socket, client_address = server.accept()

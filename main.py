@@ -194,7 +194,7 @@ if (len(sys.argv) <= 1):
 
             cv2.waitKey(2000)
 
-            img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
+            img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.png"
             cv2.imwrite(img_path, img)
             print("{} written!".format(img_path))
             
@@ -208,7 +208,7 @@ else:
 
 #--------- Clothing Item Detection -------------
 clothingItemsDF = getClothingItems(img_path)
-out_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
+out_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.png"
 
 colorList = []
 colorSet = set()
