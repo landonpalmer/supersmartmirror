@@ -1,0 +1,96 @@
+<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Smart Mirror</title>
+</head>
+<body style="background-color: #120D31;">
+    <div style="background-color: #120D31; display: grid; align-items: center; position: fixed; width: 100%; height: 80%;">
+        <div style="padding: 0;">
+            <div id="title-header" style="text-align: center; padding-top: 5%; padding: 0;">
+                <h1 style="color: #F0D3F7;">Welcome to the Super Smart Mirror!</h1>
+            </div>
+            <div id="time" style="text-align: center;">
+                <h2 id="clock" style="color: #F0D3F7;">6:10 PM</h2>
+            </div>
+            <div id="weather-div" style="text-align: center;">
+                <h2 style="margin: 0; color: #F0D3F7;">""" + city_name + """</h2>
+                <h3 style="margin: 0; color: #F0D3F7;">""" + description + """</h3>
+                <h1 style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #F0D3F7;">""" + str(temperature) + """&deg;F</h1>
+                <h5 style="margin: 0; color: #F0D3F7;">
+                    <p style="margin: 0; color: #F0D3F7;">H: """ + str(high_temp) + """&deg;  L: """ + str(low_temp) + """&deg;</p>
+                </h5>
+                <h5 style="margin: 0; color: #F0D3F7;">Preciption: """ + str(percent_precip) + """%</h5>
+            </div>
+        </div>
+        <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
+            <h1 style="color: #F0D3F7;" id="result">Press the button to take a picture and see if your outfit matches</h1>
+        </div>
+        <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
+            <p style="margin: 0; color: #F0D3F7;">Cat Fact: Cats have legs.</p>
+        </div>
+    </div>
+    <script>
+        function Time() {
+            var date = new Date();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            
+            // Variable to store AM / PM
+            var period = "";
+
+            if (hour >= 12) {
+                period = "PM";
+            } else {
+                period = "AM";
+            }
+
+            // Converting the hour in 12-hour format
+            if (hour == 0) {
+                hour = 12;
+            } else {
+                if (hour > 12) {
+                    hour = hour - 12;
+                }
+            }
+        
+            // Updating hour, minute, and second
+            // if they are less than 10
+            hour = update(hour);
+            minute = update(minute);
+            second = update(second);
+            // Adding time elements to the div
+            document.getElementById("clock").innerText = hour + " : " + minute + " : " + second + " " + period;
+            // Set Timer to 1 sec (1000 ms)
+            setTimeout(Time, 1000);
+        }
+
+        // Function to update time elements if they are less than 10
+        // Append 0 before time elements if they are less than 10
+        function update(t) {
+            if (t < 10) {
+                return "0" + t;
+            }
+            else {
+                return t;
+            }
+        }
+        Time();
+        document.body.onkeyup = function(e) {
+        if (e.key == " " ||
+            e.code == "Space" ||      
+            e.keyCode == 32      
+        ) {
+            document.getElementById("result").innerText = "loading...";
+            fetch("http://localhost:8001").then((response) => {
+                document.getElementById("result").innerText = response;
+            });
+        }
+}
+    </script>
+</body>
+</html>
