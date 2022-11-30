@@ -17,27 +17,23 @@
                 <h2 id="clock" style="color: #F0D3F7;">6:10 PM</h2>
             </div>
             <div id="weather-div" style="text-align: center;">
-                <h2 id="city-name" style="margin: 0; color: #F0D3F7;">""" + city_name + """</h2>
-                <h3 id="weather-description" style="margin: 0; color: #F0D3F7;">""" + description + """</h3>
-                <h1 id="temperature" style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #F0D3F7;">""" + str(temperature) + """&deg;F</h1>
+                <h2 style="margin: 0; color: #F0D3F7;">College Station</h2>
+                <h3 style="margin: 0; color: #F0D3F7;">broken clouds</h3>
+                <h1 style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #F0D3F7;">77&deg;F</h1>
                 <h5 style="margin: 0; color: #F0D3F7;">
-                    <p id="high-low-temp" style="margin: 0; color: #F0D3F7;">H: """ + str(high_temp) + """&deg;  L: """ + str(low_temp) + """&deg;</p>
+                    <p style="margin: 0; color: #F0D3F7;">H: 80&deg;  L: 63&deg;</p>
                 </h5>
-                <h5 style="margin: 0; color: #F0D3F7;">Preciption: """ + str(percent_precip) + """%</h5>
+                <h5 style="margin: 0; color: #F0D3F7;">Preciption: 34.0%</h5>
             </div>
         </div>
         <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
-            <h1 style="color: #F0D3F7;" id="message">Press the button to take a picture and see if your outfit matches</h1>
-        </div>
-        <div id="clothing-pic-div" style="text-align: center;">
+            <h1 style="color: #F0D3F7;">Press the button to take a picture and see if your outfit matches</h1>
         </div>
         <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
-            <p id="cat-fact" style="margin: 0; color: #F0D3F7;">Cat Fact: Cats have legs.</p>
+            <p style="margin: 0; color: #F0D3F7;">Cat Fact: Cats have legs.</p>
         </div>
     </div>
     <script>
-        let button_active = true;
-
         function Time() {
             var date = new Date();
             var hour = date.getHours();
@@ -83,53 +79,8 @@
                 return t;
             }
         }
+
         Time();
-        
-
-        document.body.onkeyup = function(e) {
-            if (button_active && (e.key == " " || e.code == "Space" || e.keyCode == 32)) {
-                button_active = false;
-                document.getElementById("message").innerText = "Loading...";
-                fetch('http://localhost:8001/').then(response =>{
-                    return response.json();
-                }).then(data =>{
-                    console.log(data);
-                    document.getElementById("message").innerText = "DONE";
-
-                    clothing_img_str = data["clothing_img"];
-                    color_img_str = data["color_img"];
-                    
-                    image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + clothing_img_str + '"/>'
-                    image_html = image_html + '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>'
-
-                    document.getElementById("clothing-pic-div").innerHTML = image_html;
-
-                    button_active = true;
-                })
-            }
-        }
-        
-
-        // call weather apis
-
-        
-        var x = document.getElementById("city-name");
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
-            }
-        }
-
-        function showPosition(position) {
-            x.innerHTML = "Latitude: " + position.coords.latitude +
-            "<br>Longitude: " + position.coords.longitude;
-        }
-
-        getLocation();
-
-
     </script>
 </body>
 </html>

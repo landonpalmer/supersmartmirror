@@ -149,4 +149,4 @@ f.write(html_template)
 # close the file
 f.close()
 
-os.system("start Chrome.exe --app=C:/Users/wjpas/OneDrive/Documents/A_Fall_2022/CSCE-489/sockets/GFG.html --start-fullscreen")
+os.system("start Chrome.exe --app=C:\Users\wjpas\OneDrive\Documents\A_Fall_2022\CSCE-489\supersmartmirror\GUI\GFG.html --start-fullscreen")

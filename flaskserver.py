@@ -2,6 +2,8 @@ import os
 import sys
 import cv2
 import time
+import base64
+import json
 
 
 def get_parent_dir(n=1):
@@ -39,9 +41,24 @@ import random
 from Train_Utils import get_anchors
 from ColorDetectionPipe import ColorDetectionPipe
 from ColorWheel import ColorWheel
+from flask_cors import CORS
 
 from flask import Flask, render_template
 app = Flask(__name__)
+CORS(app)
+
+
+def get_image_str(img_path):
+    with open(img_path, 'rb') as open_file:
+        img_content = open_file.read()
+    
+    # encode to base64 (still bytes)
+    base64_bytes = base64.b64encode(img_content)
+
+    # decode bytes into text
+    base64_string = base64_bytes.decode('utf-8')
+
+    return base64_string
 
 
 def getClothingItems(img_path):
@@ -151,57 +168,48 @@ def captureAnalyzeClothing():
     ####### Test this on mac - WSL doesn't have write drivers or something #########
     img_path = ""
     if (len(sys.argv) <= 1):
-        TIMER = 5
+        TIMER = 3
 
         # initialize the camera
         cam = cv2.VideoCapture(0)
 
         cv2.namedWindow("Camera")
+        cv2.setWindowProperty("Camera", cv2.WND_PROP_TOPMOST, 1)
 
-        while True:
 
-            # Display the current frame
+        # Display the current frame
+        ret, frame = cam.read()
+        cv2.imshow("Camera", frame)
+
+        prev = time.time()
+        
+        while TIMER >= 0:
             ret, frame = cam.read()
-            if not ret:
-                print("failed to grab frame")
-                break
-            cv2.imshow("Camera", frame)
 
-            # check for key to be pressed
-            k = cv2.waitKey(1)
-            if k%256 == 32:
-                # SPACE pressed start countdown timer
+            # Display the countdown on the frame
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(frame, str(TIMER), (200, 250), font, 7, 
+                (0, 255, 255), 4, cv2.LINE_AA)
+            cv2.imshow('Camera', frame)
+            cv2.waitKey(125)
 
-                prev = time.time()
-                
-                while TIMER >= 0:
-                    ret, frame = cam.read()
+            # get current time
+            curr = time.time()
 
-                    # Display the countdown on the frame
-                    font = cv2.FONT_HERSHEY_SIMPLEX
-                    cv2.putText(frame, str(TIMER), (200, 250), font, 7, 
-                        (0, 255, 255), 4, cv2.LINE_AA)
-                    cv2.imshow('Camera', frame)
-                    cv2.waitKey(125)
+            if curr-prev >= 1:
+                prev = curr
+                TIMER = TIMER - 1
+            
+        
+        ret, img = cam.read()
+        cv2.imshow('Camera', img)
 
-                    # get current time
-                    curr = time.time()
+        cv2.waitKey(2000)
 
-                    if curr-prev >= 1:
-                        prev = curr
-                        TIMER = TIMER - 1
-                    
-                
-                ret, img = cam.read()
-                cv2.imshow('Camera', img)
-
-                cv2.waitKey(2000)
-
-                img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
-                cv2.imwrite(img_path, img)
-                print("{} written!".format(img_path))
-                
-                break
+        img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
+        cv2.imwrite(img_path, img)
+        print("{} written!".format(img_path))
+            
 
         cam.release()
 
@@ -263,19 +271,25 @@ def captureAnalyzeClothing():
 
     print("Color List is now", colorList)
 
+    returnObj = {}
+
     if len(colorList) <= 1 and hadNeutral:
         print("Colors Match!!")
-        return "Colors match"
+        returnObj["colors_match"] = True
     elif (len(colorList) == 2):
         if (cw.do2ColorsMatch(colorList[0], colorList[1])):
             print("Colors Match!!")
-            return "Colors match"
+            returnObj["colors_match"] = True
         else:
             print("Colors don't match :(")
             print("Try theese color combinatios:")
 
             print("Color combination(s) for", colorList)
-            for colors in cw.thirdColorSuggestion(colorList[0], colorList[1]):
+            thirdColorSug = cw.thirdColorSuggestion(colorList[0], colorList[1])
+            secondColorSug_1 = cw.secondColorSuggestion(colorList[0])
+            secondColorSug_2 = cw.secondColorSuggestion(colorList[0])
+
+            for colors in thirdColorSug:
                 print(colors)
 
             print("Color combination(s) for", colorList[0])
@@ -285,28 +299,90 @@ def captureAnalyzeClothing():
             print("Color combination(s) for", colorList[1])
             for colors in cw.secondColorSuggestion(colorList[1]):
                 print(colors)
+            
+            returnObj["colors_match"] = False
+            
+            returnObj["suggestions"] = []
 
-            return "Colors do not match"
+            if len(thirdColorSug) > 0:
+                for colors in thirdColorSug:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+            if len(secondColorSug_1) > 0 and len(returnObj["suggestions"] < 3):
+                for colors in secondColorSug_1:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+            if len(secondColorSug_2) > 0 and len(returnObj["suggestions"] < 3):
+                for colors in secondColorSug_2:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+
     elif (len(colorList) == 3):
         if (cw.do3ColorsMatch(colorList[0], colorList[1], colorList[2])):
             print("Colors Match!!")
-            return "Colors match"
+            returnObj["colors_match"] = True
         else:
             print("Colors don't match :(")
             print("Try theese color combinatios:")
 
+            thirdColorSug_1 = cw.thirdColorSuggestion(colorList[0], colorList[1])
+            thirdColorSug_2 = cw.thirdColorSuggestion(colorList[0], colorList[2])
+            thirdColorSug_3 = cw.thirdColorSuggestion(colorList[1], colorList[2])
+
             print("Color combination(s) for (" + colorList[0] + ", " + colorList[1] + ")")
-            for colors in cw.thirdColorSuggestion(colorList[0], colorList[1]):
+            for colors in thirdColorSug_1:
                 print(colors)
 
             print("Color combination(s) for(" + colorList[0] + ", " + colorList[2] + ")")
-            for colors in cw.thirdColorSuggestion(colorList[0], colorList[2]):
+            for colors in thirdColorSug_2:
                 print(colors)
             
             print("Color combination(s) for(" + colorList[1] + ", " + colorList[2] + ")")
-            for colors in cw.thirdColorSuggestion(colorList[1], colorList[2]):
+            for colors in thirdColorSug_3:
                 print(colors)
-            return "Colors don't match"
+            
+            returnObj["colors_match"] = False
+
+            returnObj["suggestions"] = []
+
+            if len(thirdColorSug_1) > 0:
+                for colors in thirdColorSug_1:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+            if len(thirdColorSug_2) > 0 and len(returnObj["suggestions"] < 3):
+                for colors in thirdColorSug_2:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+            if len(thirdColorSug_3) > 0 and len(returnObj["suggestions"] < 3):
+                for colors in thirdColorSug_3:
+                    if (len(returnObj["suggestions"]) > 2):
+                        break
+                    returnObj["suggestions"].append(colors)
+    
+    
+    ##### Add images to response #####
+
+    colors_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
+    items_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_clothing.jpg"
+
+    # with open(items_path, 'rb') as open_file:
+    #     img_content = open_file.read()
+    
+    # # encode to base64 (still bytes)
+    # base64_bytes = base64.b64encode(img_content)
+
+    # # decode bytes into text
+    # base64_string = base64_bytes.decode('utf-8')
+
+    returnObj["clothing_img"] = get_image_str(items_path)
+    returnObj["color_img"] = get_image_str(colors_path)
+
+    return returnObj
 
 @app.route('/')
 def index():
