@@ -25,14 +25,15 @@
                 </h5>
                 <h5 style="margin: 0; color: #FFFFFF;">Preciption: """ + str(percent_precip) + """%</h5>
             </div>
+            <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
+                <p id="cat-fact" style="margin: 0; color: #FFFFFF;">Cat Fact: Cats have legs.</p>
+            </div>
         </div>
         <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
             <h1 style="color: #FFFFFF;" id="message">Press the button to take a picture and see if your outfit matches</h1>
+            <h4 style="color: #FFFFFF;" id="suggestions"></h4>
         </div>
         <div id="clothing-pic-div" style="text-align: center;">
-        </div>
-        <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
-            <p id="cat-fact" style="margin: 0; color: #FFFFFF;">Cat Fact: Cats have legs.</p>
         </div>
     </div>
     <script>
@@ -108,7 +109,15 @@
                         message = "Colors don't match :(";
 
                         suggestions = data["suggestions"];
-                        console.log(suggestions)
+                        
+                        sug_message = "Maybe try this color combination:\n| "
+                        
+                        color_combo = suggestions[0];
+                        
+                        color_combo.forEach(color => {
+                            sug_message += color + " | ";
+                        });
+                        document.getElementById("suggestions").innerText = sug_message
                     }
 
                     document.getElementById("message").innerText = message
@@ -126,21 +135,21 @@
         // call weather apis
 
         
-        var x = document.getElementById("city-name");
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition);
-            } else {
-                x.innerHTML = "Geolocation is not supported by this browser.";
-            }
-        }
+        // var x = document.getElementById("city-name");
+        // function getLocation() {
+        //     if (navigator.geolocation) {
+        //         navigator.geolocation.getCurrentPosition(showPosition);
+        //     } else {
+        //         x.innerHTML = "Geolocation is not supported by this browser.";
+        //     }
+        // }
 
-        function showPosition(position) {
-            x.innerHTML = "Latitude: " + position.coords.latitude +
-            "<br>Longitude: " + position.coords.longitude;
-        }
+        // function showPosition(position) {
+        //     x.innerHTML = "Latitude: " + position.coords.latitude +
+        //     "<br>Longitude: " + position.coords.longitude;
+        // }
 
-        getLocation();
+        // getLocation();
 
 
     </script>
