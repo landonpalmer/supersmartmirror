@@ -166,56 +166,56 @@ def getClothingItems(img_path):
 
 def captureAnalyzeClothing():
     ####### Test this on mac - WSL doesn't have write drivers or something #########
-    img_path = ""
-    if (len(sys.argv) <= 1):
-        TIMER = 3
+    img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
+    # if (len(sys.argv) <= 1):
+    #     TIMER = 3
 
-        # initialize the camera
-        cam = cv2.VideoCapture(0)
+    #     # initialize the camera
+    #     cam = cv2.VideoCapture(0)
 
-        cv2.namedWindow("Camera")
-        cv2.setWindowProperty("Camera", cv2.WND_PROP_TOPMOST, 1)
+    #     cv2.namedWindow("Camera")
+    #     cv2.setWindowProperty("Camera", cv2.WND_PROP_TOPMOST, 1)
 
 
-        # Display the current frame
-        ret, frame = cam.read()
-        cv2.imshow("Camera", frame)
+    #     # Display the current frame
+    #     ret, frame = cam.read()
+    #     cv2.imshow("Camera", frame)
 
-        prev = time.time()
+    #     prev = time.time()
         
-        while TIMER >= 0:
-            ret, frame = cam.read()
+    #     while TIMER >= 0:
+    #         ret, frame = cam.read()
 
-            # Display the countdown on the frame
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.putText(frame, str(TIMER), (200, 250), font, 7, 
-                (0, 255, 255), 4, cv2.LINE_AA)
-            cv2.imshow('Camera', frame)
-            cv2.waitKey(125)
+    #         # Display the countdown on the frame
+    #         font = cv2.FONT_HERSHEY_SIMPLEX
+    #         cv2.putText(frame, str(TIMER), (200, 250), font, 7, 
+    #             (0, 255, 255), 4, cv2.LINE_AA)
+    #         cv2.imshow('Camera', frame)
+    #         cv2.waitKey(125)
 
-            # get current time
-            curr = time.time()
+    #         # get current time
+    #         curr = time.time()
 
-            if curr-prev >= 1:
-                prev = curr
-                TIMER = TIMER - 1
+    #         if curr-prev >= 1:
+    #             prev = curr
+    #             TIMER = TIMER - 1
             
         
-        ret, img = cam.read()
-        cv2.imshow('Camera', img)
+    #     ret, img = cam.read()
+    #     cv2.imshow('Camera', img)
 
-        cv2.waitKey(2000)
+    #     cv2.waitKey(2000)
 
-        img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
-        cv2.imwrite(img_path, img)
-        print("{} written!".format(img_path))
+    #     img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
+    #     cv2.imwrite(img_path, img)
+    #     print("{} written!".format(img_path))
             
 
-        cam.release()
+    #     cam.release()
 
-        cv2.destroyAllWindows()
-    else:
-        img_path = sys.argv[1]
+    #     cv2.destroyAllWindows()
+    # else:
+    #     img_path = sys.argv[1]
 
     #--------- Clothing Item Detection -------------
     clothingItemsDF = getClothingItems(img_path)
@@ -263,12 +263,12 @@ def captureAnalyzeClothing():
     colorList = list(colorSet)
     tempSize = len(colorList)
 
-    hadNeutral = tempSize == len(colorList)
-
     print("Color list is", colorList)
 
     # Remove all neutral colors from colorlist
     colorList = list(set(colorList).difference(neutralColors))
+
+    hadNeutral = not (tempSize == len(colorList))
 
     print("Color List is now", colorList)
 
