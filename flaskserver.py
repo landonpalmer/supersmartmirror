@@ -310,12 +310,12 @@ def captureAnalyzeClothing():
                     if (len(returnObj["suggestions"]) > 2):
                         break
                     returnObj["suggestions"].append(colors)
-            if len(secondColorSug_1) > 0 and len(returnObj["suggestions"] < 3):
+            if len(secondColorSug_1) > 0 and len(returnObj["suggestions"]) < 3:
                 for colors in secondColorSug_1:
                     if (len(returnObj["suggestions"]) > 2):
                         break
                     returnObj["suggestions"].append(colors)
-            if len(secondColorSug_2) > 0 and len(returnObj["suggestions"] < 3):
+            if len(secondColorSug_2) > 0 and len(returnObj["suggestions"]) < 3:
                 for colors in secondColorSug_2:
                     if (len(returnObj["suggestions"]) > 2):
                         break

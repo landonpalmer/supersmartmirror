@@ -35,6 +35,8 @@ def drawPrettyBox(xmin, xmax, ymin, ymax, label, imgPath):
     cv2.rectangle(outImg, (xmin, ymax - 20), (xmin + w, ymax), color, -1)
     cv2.putText(outImg, label, (xmin, ymax - 5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, text_color, 1)
+    cv2.rectangle(outImg, (xmin, ymax - 20), (xmin + w, ymax), text_color, 1)
+    
 
 
     cv2.imwrite(imgPath, outImg)
@@ -61,7 +63,9 @@ def DetermineColor(H, S, V):
               'beige': [[23,255,227], [12,44,30]]
               }
     new_color_dict_HSV = {
-        'red': [[-10, 245, 164], [10, 265, 244]],
+        # 'red': [[-10, 245, 164], [10, 265, 244]],
+        'red1': [[180, 255, 255], [159, 50, 70]],
+        'red2': [[9, 255, 255], [0, 50, 70]],
         'red-orange': [[9,255,255],[3,184,105]],
         'orange': [[15,255,255],[10,143,0]],
         'yellow-orange': [[28,255,255],[18,145,0]],
@@ -83,6 +87,131 @@ def DetermineColor(H, S, V):
             return color
     return "unknown"
 
+# def DetermineColor(H,S,V):
+
+#     # check for black
+#     if V < 20:
+#         return 'black'
+    
+#     # check for white
+#     if V > 230:
+#         return 'white'
+    
+#     # check for gray
+#     if S < 50:
+#         return 'gray'
+    
+
+#     color_dict = {
+#         'red': [0, 177.5, 177.5],
+#         'red-orange': [11, 177.5, 177.5],
+#         'orange': [19, 177.5, 177.5],
+#         'yellow-orange': [30, 177.5, 177.5],
+#         'yellow': [39, 177.5, 177.5],
+#         "yellow-green": [57, 177.5, 177.5],
+#         'green': [89, 177.5, 177.5],
+#         'blue-green': [128, 177.5, 177.5],
+#         'blue': [150, 177.5, 177.5],
+#         'blue-violet':[179, 177.5, 177.5],
+#         'violet': [198, 177.5, 177.5],
+#         'red-violet':[237, 177.5, 177.5]
+#     }
+
+#     neutral_dict = {
+#         'white': [],
+#         'black': [],
+#         'gray': [],
+#         'beige': []
+#     }
+    
+#     # Find the color that h is closest to
+#     # print("Hue of this pixes is :", H)
+
+#     prevColor = 'red'
+#     pixel_color = ''
+#     for color in color_dict:
+#         hue_val = color_dict[color][0]
+
+#         if H < hue_val:
+#             # find the closest one and return
+#             prev_hue = color_dict[prevColor][0]
+#             if abs(H - prev_hue) < abs(H - hue_val):
+#                 pixel_color = prevColor
+#             else:
+#                 pixel_color = color
+#             break
+
+#         prevColor = color
+    
+#     if pixel_color == '':
+#         # compare between red and red-violet
+#         if (abs(H - 255) < abs(H - color_dict["red-violet"][0])):
+#             pixel_color = "red"
+#         else:
+#             pixel_color = "red-violet"
+    
+#     if pixel_color == 'yellow-orange' and S < 100 and V > 200:
+#         return 'beige'
+
+#     # print("Determined pixel of hue", H, "to be", pixel_color)
+
+#     return pixel_color
+
+# def determineColor(H,S,V):
+#     color_dict = {
+#         'red': [0, 177.5, 177.5],
+#         'red-orange': [19.4, 177.5, 177.5],
+#         'orange': [38.8, 177.5, 177.5],
+#         'yellow-orange': [49.4, 177.5, 177.5],
+#         'yellow': [60, 177.5, 177.5],
+#         "yellow-green": [90, 177.5, 177.5],
+#         'green': [120, 177.5, 177.5],
+#         'blue-green': [180, 177.5, 177.5],
+#         'blue': [240, 177.5, 177.5],
+#         'blue-violet':[256.8, 177.5, 177.5],
+#         'violet': [273.6, 177.5, 177.5],
+#         'red-violet':[316.8, 177.5, 177.5]
+#     }
+
+#     neutral_dict = {
+#         'white': [],
+#         'black': [],
+#         'gray': [],
+#         'beige': []
+#     }
+    
+#     # Find the color that h is closest to
+#     print("Hue of this pixes is :", H)
+
+#     prevColor = 'red'
+#     pixel_color = ''
+#     for color in color_dict:
+#         hue_val = color_dict[color]
+
+#         if H < hue_val:
+#             # find the closest one and return
+#             prev_hue = color_dict[prevColor]
+#             if abs(H - prev_hue) < abs(H - hue_val):
+#                 pixel_color = prevColor
+#             else:
+#                 pixel_color = color
+#             break
+
+#         prevColor = color
+    
+#     if pixel_color == '':
+#         # compare between red and red-violet
+#         if (abs(H - color_dict["red"]) < abs(H - color_dict["red-violet"])):
+#             pixel_color = "red"
+#         else:
+#             pixel_color = "red-violet"
+    
+
+#     print("Determined pixel of hue", H, "to be", pixel_color)
+
+#     return pixel_color
+        
+
 def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath, clothing_item):
     shrinkerx = int((xmax - xmin)*.10)
     shrinkery = int((ymax - ymin)*.10)
@@ -96,28 +225,33 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath, clothing
     img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     img = cv2.rectangle(img,(xmin, ymax),(xmax, ymin),(255,255,0),1)
     color_dict_scores = {
-        'red': 0,
+        'red':0,
         'red-orange': 0,
         'orange': 0,
         'yellow-orange': 0,
         'yellow': 0,
+        "yellow-green": 0,
         'green': 0,
+        'blue-green': 0,
         'blue': 0,
+        'blue-violet':0,
         'violet': 0,
-        'white': 0,
-        'black': 0,
-        'gray': 0,
-        'beige': 0,
-        'unknown': 0, 
+        'red-violet':0,
+        'black':0,
+        'white':0,
+        'beige':0,
+        'gray':0
     }
     for i in range(xmin,xmax, 1):
         for j in range(ymin,ymax, 1):
             pixel = img[j,i]
             color = DetermineColor(pixel[0],pixel[1],pixel[2])
-            color_dict_scores[color] += 1
+            if not (color == "unknown"):
+                if ('red' in color):
+                    color_dict_scores['red'] += 1
+                else:
+                    color_dict_scores[color] += 1
     
-    unknown_value = color_dict_scores["unknown"]
-    del color_dict_scores['unknown']
     primary_color = max(color_dict_scores, key=color_dict_scores.get)
     secondary_color = sorted(color_dict_scores, key=color_dict_scores.get)[-2]
     for color in color_dict_scores:
