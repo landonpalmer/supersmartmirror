@@ -42,7 +42,7 @@ description = current_weather['weather'][0]['description']
 percent_precip = float(forecast_weather['list'][0]['pop']) * 100
 high_temp = int(float(h_l_weather["daily"]["temperature_2m_max"][0]  * (9/5) + 32))
 low_temp = int(float(h_l_weather["daily"]["temperature_2m_min"][0]  * (9/5) + 32))
-
+cat_fact = requests.request("GET", "https://meowfacts.herokuapp.com/").json()["data"][0]
 
 print("It is ", temperature, "F")
 print("With a high of", high_temp, "F\nand a low of", low_temp, "F")
@@ -89,7 +89,7 @@ html_template = """<html>
         <div id="clothing-pic-div" style="text-align: center;">
         </div>
         <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
-            <p id="cat-fact" style="margin: 0; color: #F0D3F7;">Cat Fact: Cats have legs.</p>
+            <p id="cat-fact" style="margin: 0; color: #F0D3F7;">Cat Fact: """ + str(cat_fact) + """</p>
         </div>
     </div>
     <script>
