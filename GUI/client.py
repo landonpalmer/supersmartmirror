@@ -67,33 +67,37 @@ html_template = """<html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Smart Mirror</title>
 </head>
-<body style="background-color: #120D31;">
-    <div style="background-color: #120D31; display: grid; align-items: center; position: fixed; width: 100%; height: 80%;">
+<body style="background-color: #000000;">
+    <div style="background-color: #000000; display: grid; align-items: center; position: fixed; width: 100%; height: 80%;">
         <div style="padding: 0;">
             <div id="title-header" style="text-align: center; padding-top: 5%; padding: 0;">
-                <h1 style="color: #F0D3F7;">Welcome to the Super Smart Mirror!</h1>
+                <h1 style="color: #FFFFFF;">Welcome to the Super Smart Mirror!</h1>
             </div>
             <div id="time" style="text-align: center;">
-                <h2 id="clock" style="color: #F0D3F7;">6:10 PM</h2>
+                <h2 id="clock" style="color: #FFFFFF;">6:10 PM</h2>
             </div>
             <div id="weather-div" style="text-align: center;">
-                <h2 style="margin: 0; color: #F0D3F7;">""" + city_name + """</h2>
-                <h3 style="margin: 0; color: #F0D3F7;">""" + description + """</h3>
-                <h1 style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #F0D3F7;">""" + str(temperature) + """&deg;F</h1>
-                <h5 style="margin: 0; color: #F0D3F7;">
-                    <p style="margin: 0; color: #F0D3F7;">H: """ + str(high_temp) + """&deg;  L: """ + str(low_temp) + """&deg;</p>
+                <h2 id="city-name" style="margin: 0; color: #FFFFFF;">""" + city_name + """</h2>
+                <h3 id="weather-description" style="margin: 0; color: #FFFFFF;">""" + description + """</h3>
+                <h1 id="temperature" style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #FFFFFF;">""" + str(temperature) + """&deg;F</h1>
+                <h5 style="margin: 0; color: #FFFFFF;">
+                    <p id="high-low-temp" style="margin: 0; color: #FFFFFF;">H: """ + str(high_temp) + """&deg;  L: """ + str(low_temp) + """&deg;</p>
                 </h5>
-                <h5 style="margin: 0; color: #F0D3F7;">Preciption: """ + str(percent_precip) + """%</h5>
+                <h5 style="margin: 0; color: #FFFFFF;">Preciption: """ + str(percent_precip) + """%</h5>
             </div>
         </div>
         <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
-            <h1 style="color: #F0D3F7;">Press the button to take a picture and see if your outfit matches</h1>
+            <h1 style="color: #FFFFFF;" id="message">Press the button to take a picture and see if your outfit matches</h1>
+        </div>
+        <div id="clothing-pic-div" style="text-align: center;">
         </div>
         <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
-            <p style="margin: 0; color: #F0D3F7;">Cat Fact: Cats have legs.</p>
+            <p id="cat-fact" style="margin: 0; color: #FFFFFF;">Cat Fact: Cats have legs.</p>
         </div>
     </div>
     <script>
+        let button_active = true;
+
         function Time() {
             var date = new Date();
             var hour = date.getHours();
@@ -139,8 +143,66 @@ html_template = """<html>
                 return t;
             }
         }
-
         Time();
+        
+
+        document.body.onkeyup = function(e) {
+            console.log("key :: " + e.key)
+            console.log("code ::" + e.code)
+            console.log("keycode ::" + e.keyCode)
+            if (button_active && (e.key == "a" || e.code == "KeyA" || e.keyCode == 65)) {
+                button_active = false;
+                document.getElementById("message").innerText = "Loading...";
+                fetch('http://localhost:8001/').then(response =>{
+                    return response.json();
+                }).then(data =>{
+                    console.log(data);
+
+                    colors_match = Boolean(data["colors_match"])
+
+                    color_img_str = data["color_img"];
+
+                    if (colors_match) {
+                        message = "Colors match!!!";
+                    } else {
+                        message = "Colors don't match :(";
+
+                        suggestions = data["suggestions"];
+                        console.log(suggestions)
+                    }
+
+                    document.getElementById("message").innerText = message
+                    
+                    image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>'
+
+                    document.getElementById("clothing-pic-div").innerHTML = image_html;
+
+                    button_active = true;
+                })
+            }
+        }
+        
+
+        // call weather apis
+
+        
+        // var x = document.getElementById("city-name");
+        // function getLocation() {
+        //     if (navigator.geolocation) {
+        //         navigator.geolocation.getCurrentPosition(showPosition);
+        //     } else {
+        //         x.innerHTML = "Geolocation is not supported by this browser.";
+        //     }
+        // }
+
+        // function showPosition(position) {
+        //     x.innerHTML = "Latitude: " + position.coords.latitude +
+        //     "<br>Longitude: " + position.coords.longitude;
+        // }
+
+        // getLocation();
+
+
     </script>
 </body>
 </html>
