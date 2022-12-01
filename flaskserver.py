@@ -233,12 +233,13 @@ def captureAnalyzeClothing():
         xmax = row["xmax"]
         ymin = row["ymin"]
         ymax = row["ymax"]
+        label = row["label"]
 
         print("Row is", row)
         
         ######### ColorDetectionPipe throws an error -- also should return list of colors (id doesn't right now) #####
 
-        itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path, out_path)
+        itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path, out_path, label)
         #colorDetection returns an array of [(primary_color, score),(secondary_color, score), (unknown, score)]
         #I want to compare the amount of unknown pixels to the primary and secondary to see if it would be a good idea to filter not great data
         #for now i think ill just place the item colors as primary and secondary
@@ -248,7 +249,7 @@ def captureAnalyzeClothing():
         # itemColors = ["red", "green", "blue"]
         for color in itemColors:
             colorSet.add(color)
-        print(row["label"], "determined to be", itemColors)
+        print(label, "determined to be", itemColors)
 
 
     # clothingItemsDF['Colors'] = colorList
@@ -368,7 +369,7 @@ def captureAnalyzeClothing():
     ##### Add images to response #####
 
     colors_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
-    items_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_clothing.jpg"
+    # items_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_clothing.jpg"
 
     # with open(items_path, 'rb') as open_file:
     #     img_content = open_file.read()
@@ -379,7 +380,7 @@ def captureAnalyzeClothing():
     # # decode bytes into text
     # base64_string = base64_bytes.decode('utf-8')
 
-    returnObj["clothing_img"] = get_image_str(items_path)
+    # returnObj["clothing_img"] = get_image_str(items_path)
     returnObj["color_img"] = get_image_str(colors_path)
 
     return returnObj

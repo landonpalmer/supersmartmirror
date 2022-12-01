@@ -96,11 +96,9 @@
                     console.log(data);
                     document.getElementById("message").innerText = "DONE";
 
-                    clothing_img_str = data["clothing_img"];
                     color_img_str = data["color_img"];
                     
-                    image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + clothing_img_str + '"/>'
-                    image_html = image_html + '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>'
+                    image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>'
 
                     document.getElementById("clothing-pic-div").innerHTML = image_html;
 

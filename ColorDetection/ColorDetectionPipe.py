@@ -1,5 +1,45 @@
 from platform import mac_ver
 import cv2
+import os
+import sys
+from PIL import Image
+
+
+def get_parent_dir(n=1):
+    """returns the n-th parent dicrectory of the current
+    working directory"""
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(n):
+        current_path = os.path.dirname(current_path)
+    return current_path
+
+utils_path = os.path.join(get_parent_dir(1), "Utils")
+sys.path.append(utils_path)
+
+from utils import draw_annotated_box
+
+def drawPrettyBox(xmin, xmax, ymin, ymax, label, imgPath):
+    
+    color = (200,0,0)
+    text_color = (255,255,255)
+    
+    outImg = cv2.imread(imgPath)
+    cv2.rectangle(outImg, (xmin, ymax), (xmax, ymin), color, 2)
+    
+    # For the text background
+    # Finds space required by the text so that we can put a background with that amount of width.
+    (w, h), _ = cv2.getTextSize(
+            label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)
+
+    # Prints the text.    
+    cv2.rectangle(outImg, (xmin, ymax - 20), (xmin + w, ymax), color, -1)
+    cv2.putText(outImg, label, (xmin, ymax - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, text_color, 1)
+
+
+    cv2.imwrite(imgPath, outImg)
+
+
 def CompareBounds(H, S, V, upper_bound, lower_bound):
     if H <= upper_bound[0] and H >= lower_bound[0]:
             if S <= upper_bound[1] and S >= lower_bound[1]:
@@ -43,7 +83,7 @@ def DetermineColor(H, S, V):
             return color
     return "unknown"
 
-def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath):
+def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath, clothing_item):
     shrinkerx = int((xmax - xmin)*.10)
     shrinkery = int((ymax - ymin)*.10)
     xmin+=shrinkerx
@@ -87,8 +127,16 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath):
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     outImg = cv2.imread(outputPath)
-    cv2.rectangle(outImg,(xmin, ymax),(xmax, ymin),(255,255,0),1)
-    cv2.putText(outImg,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+    #outImg = Image.open(outputPath)
+
+    # print("Size:: " + str(outImg.size))
+    # print("Width:: " + str(outImg.width))
+    # print("Height:: " + str(outImg.height))
+
+    # cv2.rectangle(outImg,(xmin, ymax),(xmax, ymin),(255,255,0),1)
+    # cv2.putText(outImg,"primary color: " + primary_color,(xmin+10, ymax+20),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
+
+    label_str = clothing_item + " " + primary_color
 
     # Only returns secondary color if it is greater than 15% of primary color
     primaryScore = color_dict_scores[primary_color]
@@ -98,16 +146,19 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath):
     secondary_color_return = (secondary_color, secondaryScore)
 
     if secondaryScore > (primaryScore * 0.15):
-        cv2.putText(outImg,"secondary_color: " + secondary_color,(xmin+10, ymax+40),font, 1.0, (0,0,0), 1, cv2.LINE_AA)
-        
-        cv2.imwrite(outputPath, outImg)
+        label_str += ", " + secondary_color
+        # outImg = draw_annotated_box(outImg, [(xmin,ymin,xmax,ymax)], [label_str], [(159, 43, 104)])
+        drawPrettyBox(xmin, xmax, ymin, ymax, label_str, outputPath)
 
         cv2.destroyAllWindows()
 
         return [primary_color, secondary_color]
     
     # Save the cv2 img
-    cv2.imwrite(outputPath, outImg)
+
+    # outImg = draw_annotated_box(outImg, [(xmin,ymin,xmax,ymax)], [label_str], ([]))
+    # outImg.save(outputPath)
+    drawPrettyBox(xmin, xmax, ymin, ymax, label_str, outputPath)
     cv2.destroyAllWindows()
 
     return [primary_color]
