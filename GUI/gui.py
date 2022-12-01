@@ -71,16 +71,16 @@ html_template = """<html>
                 <h1 style="color: #F0D3F7;">Welcome to the Super Smart Mirror!</h1>
             </div>
             <div id="time" style="text-align: center;">
-                <h2 id="clock" style="color: #F0D3F7;">6:10 PM</h2>
+                <h1 id="clock" style="color: #F0D3F7;">6:10 PM</h1>
             </div>
             <div id="weather-div" style="text-align: center;">
                 <h2 id="city-name" style="margin: 0; color: #F0D3F7;">""" + city_name + """</h2>
                 <h3 id="weather-description" style="margin: 0; color: #F0D3F7;">""" + description + """</h3>
                 <h1 id="temperature" style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #F0D3F7;">""" + str(temperature) + """&deg;F</h1>
-                <h5 style="margin: 0; color: #F0D3F7;">
+                <h4 style="margin: 0; color: #F0D3F7;">
                     <p id="high-low-temp" style="margin: 0; color: #F0D3F7;">H: """ + str(high_temp) + """&deg;  L: """ + str(low_temp) + """&deg;</p>
-                </h5>
-                <h5 style="margin: 0; color: #F0D3F7;">Preciption: """ + str(percent_precip) + """%</h5>
+                </h4>
+                <h4 style="margin: 0; color: #F0D3F7;">Preciption: """ + str(percent_precip) + """%</h4>
             </div>
         </div>
         <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
@@ -88,7 +88,7 @@ html_template = """<html>
         </div>
         <div id="clothing-pic-div" style="text-align: center;">
         </div>
-        <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%;">
+        <div style="text-align: center; position: fixed; left: 0; bottom: 0; width: 100%; margin-bottom: 3%; padding-left: 20px; padding-right: 20px;">
             <p id="cat-fact" style="margin: 0; color: #F0D3F7;">Cat Fact: """ + str(cat_fact) + """</p>
         </div>
     </div>
@@ -208,4 +208,4 @@ f.write(html_template)
 # close the file
 f.close()
 
-os.system("start Chrome.exe --app=C:\\Users\\wjpas\\OneDrive\\Documents\\A_Fall_2022\\CSCE-489\\supersmartmirror\\GUI\\GFG.html --start-fullscreen")
+#os.system("start Chrome.exe --app=C:\\Users\\wjpas\\OneDrive\\Documents\\A_Fall_2022\\CSCE-489\\supersmartmirror\\GUI\\GFG.html --start-fullscreen")
