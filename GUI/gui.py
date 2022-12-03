@@ -63,18 +63,31 @@ html_template = """<html>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Smart Mirror</title>
+    <style>
+    h1 {
+        font-size: 40px;
+    }
+    h2 {
+        font-size: 50px;
+    }
+    @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+    }
+    </style>
 </head>
 <body style="background-color: #000000;">
     <div style="background-color: #000000; display: grid; align-items: center; position: fixed; width: 100%; height: 80%;">
         <div style="padding: 0;">
             <div id="title-header" style="text-align: center; padding-top: 5%; padding: 0;">
-                <h1 style="color: #FFFFFF;">Welcome to the Super Smart Mirror!</h1>
+                <h1 style="color: #FFFFFF;"><i>Welcome to the Super Smart Mirror!</i></h1>
             </div>
             <div id="time" style="text-align: center;">
                 <h2 id="clock" style="color: #FFFFFF;">6:10 PM</h2>
             </div>
             <div id="weather-div" style="text-align: center;">
-                <h2 id="city-name" style="margin: 0; color: #FFFFFF;">""" + city_name + """</h2>
+                <h3 id="city-name" style="margin: 0; color: #FFFFFF;">""" + city_name + """</h3>
                 <h3 id="weather-description" style="margin: 0; color: #FFFFFF;">""" + description + """</h3>
                 <h1 id="temperature" style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #FFFFFF;">""" + str(temperature) + """&deg;F</h1>
                 <h5 style="margin: 0; color: #FFFFFF;">
@@ -151,11 +164,15 @@ html_template = """<html>
             if (button_active && (e.key == "a" || e.code == "KeyA" || e.keyCode == 65)) {
                 button_active = false;
                 document.getElementById("message").innerText = "Loading...";
-                fetch('http://localhost:8001/').then(response =>{
-                    return response.json();
+                document.getElementById("message").setAttribute('style', 'animation: blinker 1.5s linear infinite; color: white');
+                document.getElementById("suggestions").innerText = "";
+                document.getElementById("clothing-pic-div").hidden = true;
+                fetch('http://localhost:8001/').then(response =>{ 
+                    return response.json(); 
                 }).then(data =>{
                     console.log(data);
 
+                    document.getElementById("message").setAttribute('style', 'animation: none; color: white');
                     colors_match = Boolean(data["colors_match"])
 
                     color_img_str = data["color_img"];
@@ -181,6 +198,7 @@ html_template = """<html>
                     
                     image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>';
 
+                    document.getElementById("clothing-pic-div").hidden = false;
                     document.getElementById("clothing-pic-div").innerHTML = image_html;
 
                     button_active = true;
@@ -220,4 +238,4 @@ f.write(html_template)
 # close the file
 f.close()
 
-os.system("start Chrome.exe --app=C:\\Users\\wjpas\\OneDrive\\Documents\\A_Fall_2022\\CSCE-489\\supersmartmirror\\GUI\\GFG.html --start-fullscreen")
+# os.system("start Chrome.exe --app=C:\\Users\\wjpas\\OneDrive\\Documents\\A_Fall_2022\\CSCE-489\\supersmartmirror\\GUI\\GFG.html --start-fullscreen")
