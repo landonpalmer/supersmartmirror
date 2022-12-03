@@ -20,6 +20,10 @@ def DetermineColor(H, S, V):
     #           'gray': [[180, 18, 230], [0, 0, 40]],
     #           'beige': [[23,255,227], [12,44,30]]
     #           }
+    # if (V <= 5):
+    #     return "black"
+    # if (V >= 250):
+    #     return "white"
     color_dict_HSV = {
         'red1': [[3,255,255],[0,132,82]],
         'red-orange': [[16,255,255],[4,59,0]],
@@ -34,8 +38,6 @@ def DetermineColor(H, S, V):
         'violet': [[154,255,255],[137,15,36]],
         'red-violet': [[162,255,255],[155,7,31]],
         'red2' : [[179,255,255],[163,38,0]],
-        'white': [[180,40,255],[0,0,231]],
-        'black': [[179,255,58],[0,0,0]]
     }
     for color in color_dict_HSV:
         upper_bound = color_dict_HSV[color][0]
