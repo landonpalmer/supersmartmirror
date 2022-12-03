@@ -26,6 +26,7 @@ sys.path.append(src_path)
 sys.path.append(utils_path)
 sys.path.append(color_detection_path)
 sys.path.append(color_wheel_path)
+initialOpen = False
 
 import argparse
 from keras_yolo3.yolo import YOLO, detect_video, detect_webcam
@@ -170,12 +171,9 @@ def captureAnalyzeClothing():
     if (len(sys.argv) <= 1):
         TIMER = 3
 
-        # initialize the camera
-        cam = cv2.VideoCapture(0)
-
         cv2.namedWindow("Camera")
         cv2.setWindowProperty("Camera", cv2.WND_PROP_TOPMOST, 1)
-
+        cv2.setWindowProperty("Camera", cv2.WND_PROP_FULLSCREEN, 1)
 
         # Display the current frame
         ret, frame = cam.read()
@@ -211,9 +209,10 @@ def captureAnalyzeClothing():
         print("{} written!".format(img_path))
             
 
-        cam.release()
+        #cam.release()
 
         cv2.destroyAllWindows()
+        
     else:
         img_path = sys.argv[1]
 
@@ -391,4 +390,8 @@ def index():
     return clothingMatchString
 
 if __name__ == '__main__':
-     app.run(debug=True, port=8001)
+    # initialize the camera
+    cam = cv2.VideoCapture(0)
+
+    app.run(debug=True, port=8001)
+     
