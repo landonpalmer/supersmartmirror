@@ -205,7 +205,7 @@ def captureAnalyzeClothing():
 
         cv2.waitKey(2000)
 
-        img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_clothing.jpg"
+        img_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame.jpg"
         cv2.imwrite(img_path, img)
         print("{} written!".format(img_path))
             

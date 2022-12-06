@@ -10,3 +10,5 @@ black
 gdown
 flask
 flask-cors
+geocoder
+timezonefinder
