@@ -137,6 +137,7 @@ class YOLO(object):
 
     def detect_image(self, image, show_stats=True):
         start = timer()
+        # K.clear_session()
 
         if self.model_image_size != (None, None):
             assert self.model_image_size[0] % 32 == 0, "Multiples of 32 required"
@@ -217,6 +218,7 @@ class YOLO(object):
             del draw
 
         end = timer()
+        # K.clear_session()
         if show_stats:
             print("Time spent: {:.3f}sec".format(end - start))
         return out_prediction, image

@@ -1,0 +1,175 @@
+<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Smart Mirror</title>
+    <style>
+    h1 {
+        font-size: 40px;
+    }
+    h2 {
+        font-size: 50px;
+    }
+    @keyframes blinker {
+            50% {
+                opacity: 0;
+            }
+    }
+    </style>
+</head>
+<body style="background-color: #000000;">
+    <div style="background-color: #000000; display: grid; align-items: center; position: fixed; width: 100%; height: 80%;">
+        <div style="padding: 0;">
+            <div id="title-header" style="text-align: center; padding-top: 5%; padding: 0;">
+                <h1 style="color: #FFFFFF;"><i>Welcome to the Super Smart Mirror!</i></h1>
+            </div>
+            <div id="time" style="text-align: center;">
+                <h2 id="clock" style="color: #FFFFFF;">6:10 PM</h2>
+            </div>
+            <div id="weather-div" style="text-align: center;">
+                <h3 id="city-name" style="margin: 0; color: #FFFFFF;">College Station</h3>
+                <h3 id="weather-description" style="margin: 0; color: #FFFFFF;">overcast clouds</h3>
+                <h1 id="temperature" style="margin: 0; margin-top: 10px; margin-bottom: 10px; color: #FFFFFF;">57&deg;F</h1>
+                <h5 style="margin: 0; color: #FFFFFF;">
+                    <p id="high-low-temp" style="margin: 0; color: #FFFFFF;">H: 69&deg;  L: 55&deg;</p>
+                </h5>
+                <h5 style="margin: 0; color: #FFFFFF;">Preciption: 0.0%</h5>
+            </div>
+            <div style="text-align: center; left: 0; bottom: 0; width: 100%; margin-bottom: 3%; margin-top:15px;">
+                <p id="cat-fact" style="margin: 0; color: #FFFFFF;">Cat Fact: The chlorine in fresh tap water irritates sensitive parts of the cat's nose. Let tap water sit for 24 hours before giving it to a cat.</p>
+            </div>
+        </div>
+        <div id="message-div" style="width: 50%; margin-left: auto; margin-right: auto; text-align: center;">
+            <h1 style="color: #FFFFFF;" id="message">Press the button to take a picture and see if your outfit matches</h1>
+            <h4 style="color: #FFFFFF;" id="suggestions"></h4>
+        </div>
+        <div id="clothing-pic-div" style="text-align: center;">
+        </div>
+    </div>
+    <script>
+        let button_active = true;
+
+        function Time() {
+            var date = new Date();
+            var hour = date.getHours();
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            
+            // Variable to store AM / PM
+            var period = "";
+
+            if (hour >= 12) {
+                period = "PM";
+            } else {
+                period = "AM";
+            }
+
+            // Converting the hour in 12-hour format
+            if (hour == 0) {
+                hour = 12;
+            } else {
+                if (hour > 12) {
+                    hour = hour - 12;
+                }
+            }
+        
+            // Updating hour, minute, and second
+            // if they are less than 10
+            hour = update(hour);
+            minute = update(minute);
+            second = update(second);
+            // Adding time elements to the div
+            document.getElementById("clock").innerText = hour + " : " + minute + " : " + second + " " + period;
+            // Set Timer to 1 sec (1000 ms)
+            setTimeout(Time, 1000);
+        }
+
+        // Function to update time elements if they are less than 10
+        // Append 0 before time elements if they are less than 10
+        function update(t) {
+            if (t < 10) {
+                return "0" + t;
+            }
+            else {
+                return t;
+            }
+        }
+        Time();
+        
+
+        document.body.onkeyup = function(e) {
+            console.log("key :: " + e.key);
+            console.log("code ::" + e.code);
+            console.log("keycode ::" + e.keyCode);
+            if (button_active && (e.key == "a" || e.code == "KeyA" || e.keyCode == 65)) {
+                button_active = false;
+                document.getElementById("message").innerText = "Loading...";
+                document.getElementById("message").setAttribute('style', 'animation: blinker 1.5s linear infinite; color: white');
+                document.getElementById("suggestions").innerText = "";
+                document.getElementById("clothing-pic-div").hidden = true;
+                fetch('http://localhost:8001/').then(response =>{ 
+                    return response.json(); 
+                }).then(data =>{
+                    console.log(data);
+
+                    document.getElementById("message").setAttribute('style', 'animation: none; color: white');
+                    colors_match = Boolean(data["colors_match"])
+
+                    color_img_str = data["color_img"];
+
+                    if (colors_match) {
+                        message = "Colors match!!!";
+                    } else {
+                        message = "Colors don't match :(";
+
+                        suggestions = data["suggestions"];
+                        
+                        sug_message = "Maybe try this color combination:\n| "
+                        
+                        color_combo = suggestions[0];
+                        
+                        color_combo.forEach(color => {
+                            sug_message += color + " | ";
+                        });
+                        document.getElementById("suggestions").innerText = sug_message;
+                    }
+
+                    document.getElementById("message").innerText = message;
+                    
+                    image_html = '<img style="width: 30%" src="data:image/jpg;base64, ' + color_img_str + '"/>';
+
+                    document.getElementById("clothing-pic-div").hidden = false;
+                    document.getElementById("clothing-pic-div").innerHTML = image_html;
+
+                    button_active = true;
+                })
+            }
+        }
+        
+
+        // call weather apis
+
+        
+        // var x = document.getElementById("city-name");
+        // function getLocation() {
+        //     if (navigator.geolocation) {
+        //         navigator.geolocation.getCurrentPosition(showPosition);
+        //     } else {
+        //         x.innerHTML = "Geolocation is not supported by this browser.";
+        //     }
+        // }
+
+        // function showPosition(position) {
+        //     x.innerHTML = "Latitude: " + position.coords.latitude +
+        //     "<br>Longitude: " + position.coords.longitude;
+        // }
+
+        // getLocation();
+
+
+    </script>
+</body>
+</html>
