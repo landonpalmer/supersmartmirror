@@ -50,40 +50,33 @@ def CompareBounds(H, S, V, upper_bound, lower_bound):
     return False
 
 def DetermineColor(H, S, V):
-    color_dict_HSV = {'black': [[180, 255, 30], [0, 0, 0]],
-              'white': [[180, 18, 255], [0, 0, 231]],
-              'red1': [[180, 255, 255], [159, 50, 70]],
-              'red2': [[9, 255, 255], [0, 50, 70]],
-              'green': [[89, 255, 255], [36, 50, 70]],
-              'blue': [[128, 255, 255], [90, 50, 70]],
-              'yellow': [[35, 255, 255], [25, 50, 70]],
-              'purple': [[158, 255, 255], [129, 50, 70]],
-              'orange': [[24, 255, 255], [5, 143, 0]],
-              'gray': [[180, 18, 230], [0, 0, 40]],
-              'beige': [[23,255,227], [12,44,30]]
-              }
-    new_color_dict_HSV = {
-        # 'red': [[-10, 245, 164], [10, 265, 244]],
-        'red1': [[180, 255, 255], [159, 50, 70]],
-        'red2': [[9, 255, 255], [0, 50, 70]],
-        'red-orange': [[9,255,255],[3,184,105]],
-        'orange': [[15,255,255],[10,143,0]],
-        'yellow-orange': [[28,255,255],[18,145,0]],
-        'yellow': [[32,255,255],[25,122,0]],
-        'green': [[74,255,255],[42,122,0]],
-        'blue' : [[122,255,255],[83,118,0]],
-        'violet': [[166,255,255],[125,109,0]],
-        'white': [[180,40,255],[0,0,231]],
-        'black': [[179,255,58],[0,0,0]],
-        'gray': [[180, 18, 230], [0, 0, 40]],
-        'beige': [[23,255,227], [12,44,30]]
+    if (V <= 40):
+        return "black"
+    if CompareBounds(H,S,V, [179,46,162],[0,0,0]):
+        return "gray"
+    if CompareBounds(H,S,V,[255,37,255],[0,0,173]):
+        return "white"
+    color_dict_HSV = {
+        'red1': [[3,255,255],[0,132,0]],
+        'red-orange': [[16,255,255],[4,59,0]],
+        'orange': [[22,255,255],[17,68,0]],
+        'yellow-orange': [[27,255,255],[23,56,0]],
+        'yellow': [[36,255,255],[28,44,0]],
+        'yellow-green' : [[56,255,255],[37,44,0]],
+        'green': [[81,255,255],[57,44,0]],
+        'blue-green' : [[100,255,255],[82,44,0]],
+        'blue' : [[127,255,255],[101,41,0]],
+        'blue-violet' : [[136, 255,255],[128, 15, 0]],
+        'violet': [[154,255,255],[137,15,0]],
+        'red-violet': [[162,255,255],[155,7,0]],
+        'red2' : [[179,255,255],[163,38,0]],
     }
-    for color in new_color_dict_HSV:
-        upper_bound = new_color_dict_HSV[color][0]
-        lower_bound = new_color_dict_HSV[color][1]
+    for color in color_dict_HSV:
+        upper_bound = color_dict_HSV[color][0]
+        lower_bound = color_dict_HSV[color][1]
         if (CompareBounds(H, S, V, upper_bound, lower_bound)):
-            # if (color == "red1") or (color == "red2"):
-            #     return "red"
+            if (color == "red1") or (color == "red2"):
+                return "red"
             return color
     return "unknown"
 
@@ -230,17 +223,17 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath, clothing
         'orange': 0,
         'yellow-orange': 0,
         'yellow': 0,
-        "yellow-green": 0,
+        'yellow-green': 0,
         'green': 0,
-        'blue-green': 0,
+        'blue-green' : 0,
         'blue': 0,
-        'blue-violet':0,
+        'blue-violet' : 0,
         'violet': 0,
-        'red-violet':0,
-        'black':0,
-        'white':0,
-        'beige':0,
-        'gray':0
+        'red-violet' : 0,
+        'white': 0,
+        'black': 0,
+        "gray": 0,
+        'unknown': 0, 
     }
 
 

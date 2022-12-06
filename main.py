@@ -207,6 +207,7 @@ else:
     img_path = sys.argv[1]
 
 #--------- Clothing Item Detection -------------
+print("img path is ", img_path)
 clothingItemsDF = getClothingItems(img_path)
 out_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.png"
 
