@@ -242,6 +242,8 @@ def ColorDetectionPipe(xmin, xmax, ymin, ymax, picturePath, outputPath, clothing
         'beige':0,
         'gray':0
     }
+
+
     for i in range(xmin,xmax, 1):
         for j in range(ymin,ymax, 1):
             pixel = img[j,i]

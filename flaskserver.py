@@ -49,6 +49,9 @@ app = Flask(__name__)
 CORS(app)
 
 
+ # Set up folder names for default values
+
+
 def get_image_str(img_path):
     with open(img_path, 'rb') as open_file:
         img_content = open_file.read()
@@ -64,8 +67,7 @@ def get_image_str(img_path):
 
 def getClothingItems(img_path):
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
-    # Set up folder names for default values
+        
     data_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Data")
 
     image_folder = os.path.join(data_folder, "Source_Images")
@@ -94,7 +96,6 @@ def getClothingItems(img_path):
             "model_image_size": (416, 416),
         }
     )
-        
 
     output_path = detection_results_folder
     if not os.path.exists(output_path):
@@ -161,7 +162,7 @@ def getClothingItems(img_path):
             )
         )
     
-    yolo.close_session()
+    # yolo.close_session()
     
     return out_df
 

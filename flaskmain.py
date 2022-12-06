@@ -52,6 +52,7 @@ from ColorWheel import ColorWheel
 app = Flask(__name__)
 
 def getClothingItems(img_path):
+    print("\n\n\n\nIN HERE\n\n\n\n")
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
     # Set up folder names for default values
@@ -64,6 +65,7 @@ def getClothingItems(img_path):
     detection_results_folder = os.path.join(image_folder, "Test_Image_Detection_Results")
     detection_results_file = os.path.join(detection_results_folder, "Detection_Results.csv")
 
+
     model_folder = os.path.join(data_folder, "Model_Weights")
 
     model_weights = os.path.join(model_folder, "trained_weights_final.h5")
@@ -73,6 +75,7 @@ def getClothingItems(img_path):
 
     anchors = get_anchors(anchors_path)
     # define YOLO detector
+    print("creating yolo obj")
     yolo = YOLO(
         **{
             "model_path": model_weights,
@@ -83,6 +86,7 @@ def getClothingItems(img_path):
             "model_image_size": (416, 416),
         }
     )
+    print("done with creating yolo obj")
         
 
     output_path = detection_results_folder
@@ -110,6 +114,7 @@ def getClothingItems(img_path):
     class_file = open(model_classes, "r")
     input_labels = [line.rstrip("\n") for line in class_file.readlines()]
 
+    print("before detecting obj")
     prediction, image = detect_object(
         yolo,
         img_path,
@@ -150,7 +155,9 @@ def getClothingItems(img_path):
             )
         )
     
+
     yolo.close_session()
+    print("after detecting obj")
     
     return out_df
 
@@ -325,13 +332,14 @@ def getClothingData():
 # ‘/’ URL is bound with index function.
 def index():
     # threading.Thread(target=getClothingData()).start()
+    print("I is in the index thingy now\n\n\n", file=sys.stdout)
     fetched_cat_fact=getClothingData()
     return render_template("index.html", cat_fact=fetched_cat_fact)
  
 
 # main driver function
 if __name__ == '__main__':
- 
+    print("i is the main driver function now\n\n", flush=True)
     # run() method of Flask class runs the application
     # on the local development server.
     app.run()
