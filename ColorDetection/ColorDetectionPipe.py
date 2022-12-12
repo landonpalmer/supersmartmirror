@@ -77,6 +77,8 @@ def DetermineColor(H, S, V):
         if (CompareBounds(H, S, V, upper_bound, lower_bound)):
             if (color == "red1") or (color == "red2"):
                 return "red"
+            # if color == "blue-green":
+            #     return "green"
             return color
     return "unknown"
 

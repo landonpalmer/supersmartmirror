@@ -88,7 +88,7 @@ class ColorDetection:
 
     def getClothingItems(self, img_path):
         print("\n\n\n\nIN HERE\n\n\n\n")
-        os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+        # os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
         # Set up folder names for default values
 
@@ -119,8 +119,6 @@ class ColorDetection:
         class_file = open(self.model_classes, "r")
         input_labels = [line.rstrip("\n") for line in class_file.readlines()]
 
-        print("before detecting obj")
-        K.clear_session()
         prediction, image = detect_object(
             self.yolo,
             img_path,

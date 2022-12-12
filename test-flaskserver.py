@@ -15,13 +15,13 @@ app = Flask(__name__)
 # ‘/’ URL is bound with index function.
 def index():
     # threading.Thread(target=getClothingData()).start()
+    cd = ColorDetection(0)
     fetched_cat_fact=cd.getClothingData()
     return render_template("index.html", cat_fact=fetched_cat_fact)
  
 
 # main driver function
 if __name__ == '__main__':
-    cd = ColorDetection(0)
     # run() method of Flask class runs the application
     # on the local development server.
     app.run(port=8001)

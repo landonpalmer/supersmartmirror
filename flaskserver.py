@@ -218,6 +218,7 @@ def captureAnalyzeClothing():
         img_path = sys.argv[1]
 
     #--------- Clothing Item Detection -------------
+    
     clothingItemsDF = getClothingItems(img_path)
     out_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
 
@@ -354,12 +355,12 @@ def captureAnalyzeClothing():
                     if (len(returnObj["suggestions"]) > 2):
                         break
                     returnObj["suggestions"].append(colors)
-            if len(thirdColorSug_2) > 0 and len(returnObj["suggestions"] < 3):
+            if len(thirdColorSug_2) > 0 and len(returnObj["suggestions"]) < 3:
                 for colors in thirdColorSug_2:
                     if (len(returnObj["suggestions"]) > 2):
                         break
                     returnObj["suggestions"].append(colors)
-            if len(thirdColorSug_3) > 0 and len(returnObj["suggestions"] < 3):
+            if len(thirdColorSug_3) > 0 and len(returnObj["suggestions"]) < 3:
                 for colors in thirdColorSug_3:
                     if (len(returnObj["suggestions"]) > 2):
                         break
