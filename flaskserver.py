@@ -18,14 +18,15 @@ def get_parent_dir(n=1):
 src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "2_Training", "src")
 utils_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Utils")
 color_detection_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ColorDetection")
-color_wheel_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ColorMatching")
+recommendations_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Recommendations")
 
 print(src_path)
+print(recommendations_path)
 
 sys.path.append(src_path)
 sys.path.append(utils_path)
 sys.path.append(color_detection_path)
-sys.path.append(color_wheel_path)
+sys.path.append(recommendations_path)
 initialOpen = False
 
 import argparse
@@ -41,7 +42,8 @@ from Get_File_Paths import GetFileList
 import random
 from Train_Utils import get_anchors
 from ColorDetectionPipe import ColorDetectionPipe
-from ColorWheel import ColorWheel
+from Clothing_Item import Clothing_Item
+from Outfit_Local import Outfit
 from flask_cors import CORS
 
 from flask import Flask, render_template
@@ -229,6 +231,10 @@ def captureAnalyzeClothing():
     img = cv2.imread(img_path)
     cv2.imwrite(out_path, img)
 
+    # Build the outfit object
+
+    fit = Outfit()
+
     for index, row in clothingItemsDF.iterrows():
         xmin = row["xmin"]
         xmax = row["xmax"]
@@ -238,150 +244,22 @@ def captureAnalyzeClothing():
 
         print("Row is", row)
         
-        ######### ColorDetectionPipe throws an error -- also should return list of colors (id doesn't right now) #####
-
         itemColorsSet = ColorDetectionPipe(xmin, xmax, ymin, ymax, img_path, out_path, label)
-        #colorDetection returns an array of [(primary_color, score),(secondary_color, score), (unknown, score)]
-        #I want to compare the amount of unknown pixels to the primary and secondary to see if it would be a good idea to filter not great data
-        #for now i think ill just place the item colors as primary and secondary
-        # itemColors = [itemColorsSet[0][0], itemColorsSet[1][0]]
-        itemColors = itemColorsSet
-        # colorList.extend(itemColors)
-        # itemColors = ["red", "green", "blue"]
-        for color in itemColors:
-            colorSet.add(color)
-        print(label, "determined to be", itemColors)
 
-
-    # clothingItemsDF['Colors'] = colorList
-
-    wheel = ["red", "red-orange", "orange", "yellow-orange", "yellow", "yellow-green", "green", "blue-green", "blue", "blue-violet", "violet", "red-violet"]
-    neutralColors = ["black", "white", "gray", "beige"]
-
-    cw = ColorWheel(wheel)
-
-    colorList.clear()
-    colorList = list(colorSet)
-    tempSize = len(colorList)
-
-    print("Color list is", colorList)
-
-    # Remove all neutral colors from colorlist
-    colorList = list(set(colorList).difference(neutralColors))
-
-    hadNeutral = not (tempSize == len(colorList))
-
-    print("Color List is now", colorList)
-
-    returnObj = {}
-
-    if len(colorList) <= 1 and hadNeutral:
-        print("Colors Match!!")
-        returnObj["colors_match"] = True
-    elif (len(colorList) == 2):
-        if (cw.do2ColorsMatch(colorList[0], colorList[1])):
-            print("Colors Match!!")
-            returnObj["colors_match"] = True
-        else:
-            print("Colors don't match :(")
-            print("Try theese color combinatios:")
-
-            print("Color combination(s) for", colorList)
-            thirdColorSug = cw.thirdColorSuggestion(colorList[0], colorList[1])
-            secondColorSug_1 = cw.secondColorSuggestion(colorList[0])
-            secondColorSug_2 = cw.secondColorSuggestion(colorList[0])
-
-            for colors in thirdColorSug:
-                print(colors)
-
-            print("Color combination(s) for", colorList[0])
-            for colors in cw.secondColorSuggestion(colorList[0]):
-                print(colors)
-            
-            print("Color combination(s) for", colorList[1])
-            for colors in cw.secondColorSuggestion(colorList[1]):
-                print(colors)
-            
-            returnObj["colors_match"] = False
-            
-            returnObj["suggestions"] = []
-
-            if len(thirdColorSug) > 0:
-                for colors in thirdColorSug:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
-            if len(secondColorSug_1) > 0 and len(returnObj["suggestions"]) < 3:
-                for colors in secondColorSug_1:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
-            if len(secondColorSug_2) > 0 and len(returnObj["suggestions"]) < 3:
-                for colors in secondColorSug_2:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
-
-    elif (len(colorList) == 3):
-        if (cw.do3ColorsMatch(colorList[0], colorList[1], colorList[2])):
-            print("Colors Match!!")
-            returnObj["colors_match"] = True
-        else:
-            print("Colors don't match :(")
-            print("Try theese color combinatios:")
-
-            thirdColorSug_1 = cw.thirdColorSuggestion(colorList[0], colorList[1])
-            thirdColorSug_2 = cw.thirdColorSuggestion(colorList[0], colorList[2])
-            thirdColorSug_3 = cw.thirdColorSuggestion(colorList[1], colorList[2])
-
-            print("Color combination(s) for (" + colorList[0] + ", " + colorList[1] + ")")
-            for colors in thirdColorSug_1:
-                print(colors)
-
-            print("Color combination(s) for(" + colorList[0] + ", " + colorList[2] + ")")
-            for colors in thirdColorSug_2:
-                print(colors)
-            
-            print("Color combination(s) for(" + colorList[1] + ", " + colorList[2] + ")")
-            for colors in thirdColorSug_3:
-                print(colors)
-            
-            returnObj["colors_match"] = False
-
-            returnObj["suggestions"] = []
-
-            if len(thirdColorSug_1) > 0:
-                for colors in thirdColorSug_1:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
-            if len(thirdColorSug_2) > 0 and len(returnObj["suggestions"]) < 3:
-                for colors in thirdColorSug_2:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
-            if len(thirdColorSug_3) > 0 and len(returnObj["suggestions"]) < 3:
-                for colors in thirdColorSug_3:
-                    if (len(returnObj["suggestions"]) > 2):
-                        break
-                    returnObj["suggestions"].append(colors)
+        print(label, "determined to be", itemColorsSet)
+        
+        item = Clothing_Item(label)
+        item.addAllColors(itemColorsSet)
+        fit.addClothingItem(item)  
     
     
-    ##### Add images to response #####
+    ##### Add images to response #####  
+    print("Color list is:", fit.getColors())
+    print("Had Neutral?", fit.getHadNeutral())
+    returnObj = fit.getRecommendations()
 
     colors_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_colors.jpg"
-    # items_path = "./Data/Source_Images/Test_Image_Detection_Results/opencv_frame_clothing.jpg"
 
-    # with open(items_path, 'rb') as open_file:
-    #     img_content = open_file.read()
-    
-    # # encode to base64 (still bytes)
-    # base64_bytes = base64.b64encode(img_content)
-
-    # # decode bytes into text
-    # base64_string = base64_bytes.decode('utf-8')
-
-    # returnObj["clothing_img"] = get_image_str(items_path)
     returnObj["color_img"] = get_image_str(colors_path)
 
     return returnObj
